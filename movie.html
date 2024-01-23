@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <input id="title">
+  <button id="search">Search</button>
+  <p id="results"></p>
+  
+</body>
+<script>
+  const titleBox = document.getElementById('title');
+  const searchButton = document.getElementById('search');
+  const resultsP = document.getElementById('results');
+
+
+  async function search() {
+    const options = {
+      method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer '
+        }
+      };
+
+    const response = fetch(`https://api.themoviedb.org/3/search/movie?query=${titleBox.value}&include_adult=false&language=en-US&page=1`, options)
+      .then(response => response.json())
+      .then(data => {
+
+        for (let result in data.results) {
+          resultsP.innerText += data.results[result].title + '\n';
+        }
+
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+      
+    }
+    searchButton.onclick = search;
+</script>
+</html>

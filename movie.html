@@ -3,44 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Movie Search</title>
 </head>
 <body>
+  <!-- crete an input box, search button, and a paragraph for the results -->
   <input id="title">
   <button id="search">Search</button>
   <p id="results"></p>
   
 </body>
 <script>
+  // get references to html elements in JavaScript
   const titleBox = document.getElementById('title');
   const searchButton = document.getElementById('search');
   const resultsP = document.getElementById('results');
 
 
+  // create a function that will search for movies and display the results
   function search() {
+    // put your api key here
+    const apikey = 'put_your_api_key_here'
+    
+    // this options object will be used in our fetch request for authentication
     const options = {
       method: 'GET',
         headers: {
           accept: 'application/json',
-          Authorization: 'Bearer '
+          Authorization: 'Bearer ' + apikey
         }
       };
 
-    const response = fetch(`https://api.themoviedb.org/3/search/movie?query=${titleBox.value}&include_adult=false&language=en-US&page=1`, options)
+    // get the title from the input box
+    const title = titleBox.value;
+    // make a fetch request to the movie database api, movie search endpoint, filling in the title from the input box
+    // look here for more info: https://developer.themoviedb.org/reference/search-movie
+    fetch(`https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=en-US&page=1`, options)
+
+      // convert the response to json (callback function for the promise)
       .then(response => response.json())
-      .then(data => {
 
-        for (let result in data.results) {
-          resultsP.innerText += data.results[result].title + '\n';
+      // add a second .then to the promise chain to do something with the json data
+      .then(moviesData => {
+        // for each movie in the results, get the cast
+        for (let result in moviesData.results) {
+          // get the movie name
+          const movieName = moviesData.results[result].title;
+
+          // print the movie name to the console
+          console.log(movieName);
+
+          // add the movie name to the results paragraph
+          resultsP.innerText += movieName + '\n';
+
+          // print everything we know about the movie to the console (open your browser console and explore the data)
+          console.log(moviesData.results[result]);
         }
-
       })
-      .catch(err => {
-        console.log(err);
-      });
-
-      
     }
+
+  // add an event listener to the search button that will call the search function when clicked
     searchButton.onclick = search;
 </script>
 </html>

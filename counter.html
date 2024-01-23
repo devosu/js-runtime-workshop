@@ -6,18 +6,25 @@
   <title>DEV JS demo</title>
 </head>
 <body>
+  <!-- create a button and a paragraph -->
   <h1>Coutner</h1>
   <span id="counter">0</span>
 </body>
 <script>
+  // get a reference to the counter span
   const counter = document.getElementById('counter');
+  // create a variable to hold the count
   let count = 0;
 
+  // setInterval takes a callback function and a time in milliseconds
+  // it will call the callback function every time the time has elapsed
   setInterval(() => {
     count++;
     counter.innerText = count;
   }, 1000);
 
+  // setTimeout takes a callback function and a time in milliseconds
+  // it will call the callback function only once after the time has elapsed
   setTimeout(() => {
     alert('You have been on this page for 5 seconds');
   }, 5000);

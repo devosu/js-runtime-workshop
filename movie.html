@@ -3,44 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Movie Search</title>
 </head>
 <body>
+  <!-- crete an input box, search button, and a paragraph for the results -->
   <input id="title">
   <button id="search">Search</button>
   <p id="results"></p>
   
 </body>
 <script>
+  // get references to html elements in JavaScript
   const titleBox = document.getElementById('title');
   const searchButton = document.getElementById('search');
   const resultsP = document.getElementById('results');
 
 
+  // create a function that will search for movies and display the results
   function search() {
+    const apikey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNTYyNmVmNTczNjkyNjgyNzZjNGVhNzI0MjdhNmQxYiIsInN1YiI6IjY0NWU5NTM3ZDZjMzAwMDE2YmJmZGQwMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.a10lLAwX-BJ0XVSeYi_sf6vZ_maOeV8RZzOsG6C7X10'
+    // this options object will be used in our fetch request for authentication
     const options = {
       method: 'GET',
         headers: {
           accept: 'application/json',
-          Authorization: 'Bearer '
+          Authorization: 'Bearer ' + apikey
         }
       };
 
-    const response = fetch(`https://api.themoviedb.org/3/search/movie?query=${titleBox.value}&include_adult=false&language=en-US&page=1`, options)
+    // get the title from the input box
+    const title = titleBox.value;
+    // make a fetch request to the movie database api, movie search endpoint, filling in the title from the input box
+    fetch(`https://api.themoviedb.org/3/search/movie?query=${title}&include_adult=false&language=en-US&page=1`, options)
+      // convert the response to json (callback function for the promise)
       .then(response => response.json())
-      .then(data => {
-
-        for (let result in data.results) {
-          resultsP.innerText += data.results[result].title + '\n';
+      // add a second .then to the promise chain to do something with the json data
+      .then(moviesData => {
+        // for each movie in the results, get the cast
+        for (let result in moviesData.results) {
+          // get the id of the movie
+          const id = moviesData.results[result].id;
+          // make a fetch request to the movie database api, movie credits endpoint, filling in the id of the movie
+          fetch(`https://api.themoviedb.org/3/movie/${id}/credits`, options)
+          // convert the response to json (callback function for the promise)
+          .then(response => response.json())
+          // add a second .then to the promise chain to do something with the json data
+          .then(castData => {
+            // display the title of the movie (try to move this line before the second fetch request to see what happens)
+            resultsP.innerText += moviesData.results[result].title + '\n';
+            // for each cast member in the results, display their name
+            for (let cast in castData.cast) {
+              resultsP.innerText += castData.cast[cast].name + ', ';
+            }
+            // add a new line after each movie
+            resultsP.innerText += '\n';
+          })
         }
-
       })
-      .catch(err => {
-        console.log(err);
-      });
-
-      
     }
+
+    // add an event listener to the search button that will call the search function when clicked
     searchButton.onclick = search;
 </script>
 </html>
